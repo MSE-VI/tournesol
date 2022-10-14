@@ -1,109 +1,74 @@
-<h1 align="center">Tournesol - Collaborative Content Recommendations</h1>
+# Projet de MA-VI
 
-<p align="center">
-  <img
-    src="./frontend/public/logos/Tournesol_Logo.png"
-    alt="tournesol-logo"
-    width="120px"
-    height="120px"
-  />
-<p>
-<p align="center">
-  <i>
-    Tournesol is a free software designed to collaboratively identify public
-    interest videos that should be largely recommended.
-  </i>
-</p>
-<p align="center">
-  <i>
-    Participants are invited to judge the videos' quality, and build together
-    an open database to help the research in AI ethics and recommendation
-    systems.
-  </i>
-</p>
+This is an academic project for the "Visualization" course from MSE HES-SO.
+It aims to contribute to the Tournesol project by providing an interactive view
+of user data and comparisons.
 
-<p align="center">
-  <a href="https://tournesol.app"><strong>https://tournesol.app</strong></a>
-  <br>
-</p>
+The contribution will be made at the end of the project by selecting what's
+worth keeping and sharing with the Tournesol team.
 
-<p align="center">
-  <a href="https://tournesol.app/comparison">Compare Videos</a>
-  ·
-  <a href="./CONTRIBUTING.md">Contributing Guidelines</a>
-  ·
-  <a href="https://tournesol.app/about/donate">Make a Donation</a>
-  <br>
-</p>
+The following is written in french as it is only relevant to our course.
 
----
+## 14.10.2022 - Première réunion
 
-This repository hosts the source code of the Tournesol platform.
+### Plan
 
-Learn more about the project on our [Wiki][tournesol-wiki], or meet our community
-on [Discord][tournesol-discord-join].
+- Constitution de l'équipe de projet
+- Choix de la thématique, source de données
+- Définition du public cible et de l'objectif
+- Maquettes
+- Choix des technologies
+- Planification, partage des tâches
+- Inscription sur le wiki du cours
+- Création forge et début dév
 
-**Table of Content**
+### Thématique / source de données
 
- - [Structure of the repository](#structure-of-the-repository)
- - [Set-up](#set-up)
- - [Contributing](#contributing)
- - [Copyright & Licenses](#copyright--licenses)
+Contribuer au projet Tournesol et proposant une visualisation intéressante de leurs données.
 
-## Structure of the repository
+### Définition du public cible et de l'objectif
 
-- [data-visualization](./data-visualization) contains a Streamlit app to
-  visualize the Tournesol public data
-- [docs](./docs) contains different kinds of documentations related to the
-  project
-- [dev-env](./dev-env) contains the info to create the Tournesol development
-  environment with docker-compose
-- [backend](./backend) is a Django application that serves as Tournesol's API
-- [frontend](./frontend) is a React JS application which is the main website
-  and a frontend to Tournesol's API
-- [infra](./infra) contains an ansible recipe used to configure the servers
-  running Tournesol
-- [browser-extension](./browser-extension) is a JavaScript extension for
-  Google Chrome and Mozilla Firefox
-- [tests](./tests) contains end-to-end tests for Tournesol
+**Idée à discuter :** Améliorer l'attrait du projet pour le grand public et/ou les data scientists.
 
-## Set-up
+### Brainstorming
 
-Please refer to the `dev-env` directory or the corresponding documents in
-`frontend` and `backend` directories.
+- Tag / sujets
+  - Arborescence
+- Map
+  - Streaming francophone: Sujet vs popularité
+    - Changement de sujet => trait
+- Leaderboard
+  - Voisinage d'un pseudo
+- Plot (stats "dures")
+  - Contributions
 
-## Contributing
+### Maquettes
 
-### Code of Conduct
+L'utilisateur peut chercher un pseudo pour changer le "point de vue" de l'affichage.
 
-Help us keep Tournesol open and inclusive. Please read and follow our
-[Code of Conduct](./CODE_OF_CONDUCT.md).
+Une liste de vidéos recommandées à comparer est affichée sur la gauche. Des vidéos spécifiques peuvent être ajoutées via le champs de recherche en haut. En sélectionnant une vidéo à gauche, la vue de droite se déplace pour la centrer. En sélectionnant une deuxième vidéo, la vue de droite ajoute un lien entre elles et recentre la vue sur le lien. Le zoom est aussi ajusté lors des déplacements de la vue.
 
-### Contributing Guidelines
+Sur la partie de droite, on peut voir l'historique des comparaisons faites par l'utilisateur sélectionné (à l'aide de son pseudo). Cette vue représente les comparaisons entres les vidéos sous la forme de liens. Les recommandations sont ajoutées pour permettre de d'apprécier l'apport potentiel d'une contribution. En sélectionnant une vidéo ou un lien dans la vue de droite, les vidéos associées à gauche sont aussi sélectionnées. Les liens existants entre deux vidéos déjà comparées de manière isolée (et donc déjà visionnées et faciles à comparer) sont aussi présentées. Un code couleur permet de rapidement différencier une comparaison déjà effectuée d'un lien auquel on peut contribuer.
 
-Read through our [contributing guidelines](./CONTRIBUTING.md) to learn about
-the different ways to help the project.
+![image-20221014152346014](images/mockup-draft.png)
 
-### Contributors
+### Choix des technologies
 
-The code source of the project exists thanks to
-[all people who generously took the time to contribute][tournesol-github-contributors].
+[Streamlit](https://streamlit.io/) : Il s'agit d'un framework de visualisation de donnée simple et performant qui est déjà utilisé par l'équipe de Tournesol.
 
-Thank you very much!
+Notre travail pour ainsi facilement s'intégrer à ce qu'ils ont déjà fait et aura plus de chance d'être accepté et utile.
 
-## Copyright & Licenses
+### Planification, partage des tâches
 
-The Tournesol project has chosen to distribute its software and its other
-productions under the terms of different licenses.
+#### Cahier des charges
 
-See the [LICENSE.md](./LICENSE.md) file for the exhaustive list.
-
-You can find the copyright notice of each software and other production in
-their dedicated `README.md` file.
-
-[tournesol-discord-join]: https://discord.gg/WvcSG55Bf3
-
-[tournesol-wiki]: https://wiki.tournesol.app/
-[tournesol-wiki-contribute]: https://wiki.tournesol.app/wiki/Contribute_to_Tournesol
-
-[tournesol-github-contributors]: https://github.com/tournesol-app/tournesol/graphs/contributors
+- Vraie(s) maquette(s)
+- Diagrammes UML
+  - Use case
+  - Composants (séparation logique VS graphique)
+- Review avec ou sans le prof
+- Proof of Concept
+  1. Partage des tâches
+- Review avec ou sans le prof
+- Polish
+  1. Partage des tâches
