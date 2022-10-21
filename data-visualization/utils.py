@@ -85,3 +85,14 @@ def api_get_tournesol_scores():
     df.drop(columns=["criteria_scores"], inplace=True)
 
     return df
+
+@st.cache
+def api_get_video_recommendation_sample():
+    """Get a sample of recommended video to compare"""
+
+    response = requests.get(
+        f'https://api.tournesol.app/polls/videos/recommendations/?limit=20&date_gte=2022-09-20T13%3A50%3A47.288Z&unsafe=false&metadata%5Blanguage%5D=en&score_mode=default'
+    ).json()
+
+    df = pd.DataFrame.from_dict(response["results"])
+    return df
