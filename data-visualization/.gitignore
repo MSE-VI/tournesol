@@ -1,2 +1,5 @@
-**__pycache__/
-.DS_Store
+**/*.tmp.nlogo
+**/*.vpp.bak_*
+**/*.vpp.lck
+**/venv
+**/__pycache__
