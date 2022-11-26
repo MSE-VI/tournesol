@@ -140,6 +140,7 @@
     "home": "Home",
     "compare": "Compare 🌻",
     "myComparisons": "My comparisons",
+    "myGraph": "My graph",
     "comparedItems": "My compared items",
     "myRateLaterList": "My rate later list",
     "myResults": "My results",
@@ -529,6 +530,9 @@
     },
     "proofOfVoteHelperText": "This code will be helpful to complete <2>our survey.</2>",
     "proofOfVote": "Proof of vote"
+  },
+  "myGraphPage": {
+    "title": "My graph"
   },
   "personalVouchers": {
     "voucherCreated": "You successfuly vouched for \"{{username}}\".",

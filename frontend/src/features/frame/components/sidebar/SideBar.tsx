@@ -23,6 +23,7 @@ import {
   EmojiEvents as EmojiEventsIcon,
   Help as HelpIcon,
   Home as HomeIcon,
+  Hub,
   Info as InfoIcon,
   ListAlt as ListIcon,
   Stars as StarsIcon,
@@ -149,6 +150,12 @@ const SideBar = () => {
       targetUrl: `${path}comparisons`,
       IconComponent: ListIcon,
       displayText: t('menu.myComparisons'),
+    },
+    {
+      id: RouteID.MyGraph,
+      targetUrl: `${path}personal/graph`,
+      IconComponent: Hub,
+      displayText: t('menu.myGraph'),
     },
     {
       id: RouteID.MyComparedItems,

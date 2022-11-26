@@ -6,6 +6,7 @@ import PrivateRoute from 'src/features/login/PrivateRoute';
 import PageNotFound from 'src/pages/404/PageNotFound';
 import ComparisonListPage from 'src/pages/comparisons/ComparisonList';
 import FeedbackPage from 'src/pages/personal/feedback/FeedbackPage';
+import GraphPage from 'src/pages/personal/graph/GraphPage';
 import EntityAnalysisPage from 'src/pages/entities/EntityAnalysisPage';
 import HomePage from 'src/pages/home/Home';
 import RecommendationPage from 'src/pages/recommendations/RecommendationPage';
@@ -94,6 +95,12 @@ const PollRoutes = ({ pollName }: Props) => {
       id: RouteID.MyFeedback,
       url: 'personal/feedback',
       page: FeedbackPage,
+      type: PrivateRoute,
+    },
+    {
+      id: RouteID.MyGraph,
+      url: 'personal/graph',
+      page: GraphPage,
       type: PrivateRoute,
     },
   ];
