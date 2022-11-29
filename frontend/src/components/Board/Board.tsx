@@ -16,7 +16,7 @@ import { FullscreenExit } from '@mui/icons-material';
 
 import './styles.css';
 
-const Board: React.FC<{ services: any }> = ({ services }) => {
+const Board: React.FC<{ nodesList: any }> = ({ nodesList }) => {
   const nodeTypes = useMemo(() => ({ customNode: SelectorNode }), []);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -39,24 +39,20 @@ const Board: React.FC<{ services: any }> = ({ services }) => {
   }
 
   useEffect(() => {
-    const { nodes: layoutedNodes, edges: layoutedEdges } = DrawGraph(services);
+    const { nodes: layoutedNodes, edges: layoutedEdges } = DrawGraph(nodesList);
     setNodes([...layoutedNodes]);
     setEdges([...layoutedEdges]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [services]);
+  }, [nodesList]);
+
+  useEffect(() => {
+    console.log('nodes', nodes);
+    console.log('edges', edges);
+  }, [nodes, edges]);
 
   return (
     <ReactFlowProvider>
-      <ReactFlow
-        id="board"
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={nodeTypes}
-        fitView
-      >
+      <ReactFlow id="board" nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView>
         <CustomControls />
         <Background />
         <MiniMap />

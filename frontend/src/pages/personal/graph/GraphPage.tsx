@@ -10,6 +10,13 @@ const GraphPage = () => {
   const { t } = useTranslation();
   const handle = useFullScreenHandle();
 
+  const [list, setList] = React.useState({
+    nodes: [
+      { type: 'entry', id: '1', next: ['2'], data: { label: 'Input' } },
+      { type: 'end', id: '2', next: [], data: { label: 'Output' } },
+    ],
+  });
+
   return (
     <>
       <ContentHeader title={t('myGraphPage.title')} />
@@ -39,7 +46,7 @@ const GraphPage = () => {
                   }
             }
           >
-            <Board services={{}} />
+            <Board nodesList={list} />
           </Box>
         </FullScreen>
       </Container>

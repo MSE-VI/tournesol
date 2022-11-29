@@ -1,4 +1,5 @@
-import dagre from 'dagre';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const dagre = require('dagre');
 
 const nodeWidth = 200;
 const nodeHeight = 215;
@@ -16,6 +17,7 @@ export default function DrawGraph(
     serviceConfiguration !== null &&
     Object.keys(serviceConfiguration).length > 0
   ) {
+    console.log('oué on é la');
     const nodesConfig = serviceConfiguration.nodes;
 
     for (const idx in nodesConfig) {
@@ -35,7 +37,7 @@ export default function DrawGraph(
     edges = edges.flat();
     return getAlignedElements(nodes, edges);
   }
-
+  console.log('oué on é pa la');
   return { nodes, edges };
 }
 
@@ -176,28 +178,24 @@ function getNode(node: any) {
       next = node.next;
       break;
   }
-
   return {
     id: node.id,
     type: 'customNode',
     next: next,
     data: {
       label: label,
-      body: node.api?.body ? node.api.body : null,
-      bodyType: node.api?.bodyType ? node.api.bodyType : null,
-      resultType: node.api?.resultType ? node.api.resultType : null,
     },
     position: { x: 0, y: 0 },
   };
 }
 
 /*function getTypeOfNode(node: any) {
-    switch (node.type) {
-        case "entry":
-            return "input";
-        case "end":
-            return "output";
-        default:
-            return "";
+  switch (node.type) {
+    case 'entry':
+      return 'input';
+    case 'end':
+      return 'output';
+    default:
+      return '';
     }
 }*/
