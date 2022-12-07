@@ -52,7 +52,16 @@ const Board: React.FC<{ nodesList: any }> = ({ nodesList }) => {
 
   return (
     <ReactFlowProvider>
-      <ReactFlow id="board" nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView>
+      <ReactFlow
+        id="board"
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes}
+        fitView
+      >
         <CustomControls />
         <Background />
         <MiniMap />

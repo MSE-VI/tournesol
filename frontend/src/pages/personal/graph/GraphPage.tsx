@@ -1,21 +1,30 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Container } from '@mui/material';
+import { Box, Button, Container, Input } from '@mui/material';
 import { ContentHeader } from 'src/components';
 import { FullScreen, useFullScreenHandle } from 'react-full-screen';
 import { Fullscreen } from '@mui/icons-material';
 import Board from 'src/components/Board/Board';
+import { getUserComparisons } from '../../../utils/api/comparisons';
+import { useCurrentPoll } from '../../../hooks';
 
 const GraphPage = () => {
   const { t } = useTranslation();
   const handle = useFullScreenHandle();
+  const { name: pollName } = useCurrentPoll();
 
-  const [list, setList] = React.useState({
+  const [list] = React.useState({
     nodes: [
       { type: 'entry', id: '1', next: ['2'], data: { label: 'Input' } },
       { type: 'end', id: '2', next: [], data: { label: 'Output' } },
     ],
   });
+
+  React.useEffect(() => {
+    getUserComparisons(pollName, 1000).then((res) => {
+      console.log(res);
+    });
+  }, [pollName]);
 
   return (
     <>

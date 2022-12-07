@@ -17,7 +17,6 @@ export default function DrawGraph(
     serviceConfiguration !== null &&
     Object.keys(serviceConfiguration).length > 0
   ) {
-    console.log('oué on é la');
     const nodesConfig = serviceConfiguration.nodes;
 
     for (const idx in nodesConfig) {
@@ -37,7 +36,6 @@ export default function DrawGraph(
     edges = edges.flat();
     return getAlignedElements(nodes, edges);
   }
-  console.log('oué on é pa la');
   return { nodes, edges };
 }
 
