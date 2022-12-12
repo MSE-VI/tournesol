@@ -15,8 +15,12 @@ import { ControlButton } from 'reactflow';
 import { FullscreenExit } from '@mui/icons-material';
 
 import './styles.css';
+import { CircularProgress } from '@mui/material';
 
-const Board: React.FC<{ nodesList: any }> = ({ nodesList }) => {
+const Board: React.FC<{ nodesList: any; ready: boolean }> = ({
+  nodesList,
+  ready,
+}) => {
   const nodeTypes = useMemo(() => ({ customNode: SelectorNode }), []);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -39,33 +43,39 @@ const Board: React.FC<{ nodesList: any }> = ({ nodesList }) => {
   }
 
   useEffect(() => {
-    const { nodes: layoutedNodes, edges: layoutedEdges } = DrawGraph(nodesList);
-    setNodes([...layoutedNodes]);
-    setEdges([...layoutedEdges]);
+    if (ready) {
+      const { nodes: layoutedNodes, edges: layoutedEdges } =
+        DrawGraph(nodesList);
+      setNodes([...layoutedNodes]);
+      setEdges([...layoutedEdges]);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodesList]);
+  }, [nodesList, ready]);
 
   useEffect(() => {
-    console.log('nodes', nodes);
-    console.log('edges', edges);
+    // console.log('nodes', nodes);
+    // console.log('edges', edges);
   }, [nodes, edges]);
 
   return (
     <ReactFlowProvider>
-      <ReactFlow
-        id="board"
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={nodeTypes}
-        fitView
-      >
-        <CustomControls />
-        <Background />
-        <MiniMap />
-      </ReactFlow>
+      {ready ? (
+        <ReactFlow
+          id="board"
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          nodeTypes={nodeTypes}
+          fitView
+        >
+          <CustomControls />
+          <Background />
+        </ReactFlow>
+      ) : (
+        <CircularProgress />
+      )}
     </ReactFlowProvider>
   );
 };

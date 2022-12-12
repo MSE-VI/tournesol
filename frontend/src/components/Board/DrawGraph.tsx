@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const dagre = require('dagre');
 
-const nodeWidth = 200;
-const nodeHeight = 215;
+const nodeWidth = 50;
+const nodeHeight = 115;
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -40,7 +40,7 @@ export default function DrawGraph(
 }
 
 const getAlignedElements = (nodes: any[], edges: any[]) => {
-  const direction = 'LR';
+  const direction = 'TB';
 
   dagreGraph.setGraph({ rankdir: direction });
 
@@ -134,11 +134,14 @@ function getEdge(node: any) {
   let edges: any[] = [];
   let countEdges = 0;
   for (const nxt in node.next) {
+    const randomId = Math.random().toString(36).substring(7);
     const edge = {
-      id: `${node.id}-e-${countEdges}`,
+      // id as random number
+      id: `${randomId}`,
       source: node.id,
       target: node.next[nxt],
       animated: false,
+      style: { stroke: node.stroke },
     };
     edges = [...edges, edge];
     countEdges += nodeWidth;
@@ -148,7 +151,7 @@ function getEdge(node: any) {
 
 function getNode(node: any) {
   let next: any[] = [];
-  let label = node.id;
+  let label = node.data.label;
 
   switch (node.type) {
     case 'branch':
@@ -182,8 +185,14 @@ function getNode(node: any) {
     next: next,
     data: {
       label: label,
+      type: node.data.type,
     },
     position: { x: 0, y: 0 },
+    style: {
+      width: `${nodeWidth}px`,
+      backgroundColor: 'rgba(255, 26, 224, 0.2)',
+    },
+    stroke: node.stroke,
   };
 }
 
