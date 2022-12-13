@@ -4,6 +4,7 @@ import loginReducer from '../features/login/loginSlice';
 import { combineReducers } from 'redux';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import graphDrawerReducer from '../utils/reducers/drawerSlice';
 
 const persistConfig = {
   key: 'root',
@@ -11,6 +12,7 @@ const persistConfig = {
 };
 const rootReducer = combineReducers({
   drawerOpen: drawerOpenReducer,
+  graphDrawerOpen: graphDrawerReducer,
   token: loginReducer,
 });
 

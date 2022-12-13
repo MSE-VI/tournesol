@@ -159,6 +159,13 @@ export const getRecommendations = async (
       scoreMode: (params.get('score_mode') as ScoreModeEnum) ?? undefined,
       weights: criteriaWeights,
     });
+    // console.log('getRecommendations');
+    // return await PollsService.pollsRecommendationsList({
+    //   name: 'videos',
+    //   metadata: {
+    //     uploader: 'Science4All',
+    //   },
+    // });
   } catch (err) {
     console.error(err);
     return {

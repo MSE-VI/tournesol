@@ -8,7 +8,7 @@ import ReactFlow, {
   useEdgesState,
   MiniMap,
 } from 'react-flow-renderer';
-
+import { useHistory } from 'react-router-dom';
 import DrawGraph from './DrawGraph';
 import SelectorNode from './CustomNode';
 import { ControlButton } from 'reactflow';
@@ -16,21 +16,27 @@ import { FullscreenExit } from '@mui/icons-material';
 
 import './styles.css';
 import { CircularProgress } from '@mui/material';
+import { useCurrentPoll } from '../../hooks';
 
 const Board: React.FC<{ nodesList: any; ready: boolean }> = ({
   nodesList,
   ready,
 }) => {
+  const history = useHistory();
+  const navigateToComparisonPage = (source: string, target: string) =>
+    history.push(`/comparison?uidA=${source}&uidB=${target}`);
   const nodeTypes = useMemo(() => ({ customNode: SelectorNode }), []);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const pollName = useCurrentPoll();
 
-  const onConnect = useCallback(
-    (params: any) =>
-      setEdges((eds: any) => addEdge({ ...params, animated: true }, eds)),
+  const onConnect = useCallback((params: any) => {
+    console.log(params);
+    setEdges((eds: any) => addEdge({ ...params, animated: true }, eds));
+    // navigate to comparison page
+    navigateToComparisonPage(params.source, params.target);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  }, []);
 
   function CustomControls() {
     return (
@@ -74,7 +80,7 @@ const Board: React.FC<{ nodesList: any; ready: boolean }> = ({
           <Background />
         </ReactFlow>
       ) : (
-        <CircularProgress />
+        <CircularProgress sx={{ mt: 2, ml: 2}} />
       )}
     </ReactFlowProvider>
   );

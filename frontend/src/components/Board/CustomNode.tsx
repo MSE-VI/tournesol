@@ -1,44 +1,65 @@
 import React, { useState } from 'react';
 
 import { Handle, Position } from 'react-flow-renderer';
-import {
-  Card,
-  CardContent, Tooltip,
-} from '@mui/material';
+import { Tooltip } from '@mui/material';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import UserIcon from '@mui/icons-material/Person';
 import { useDispatch } from 'react-redux';
-import { useNotification } from '../../utils/useNotification';
+import { toggleDrawer } from '../../utils/reducers/drawerSlice';
+import { useHistory } from 'react-router-dom';
 
 const CustomNode = ({ data, styles }: any) => {
+  const history = useHistory();
+  const navigateToEntityPage = (entity: string) =>
+    history.push(`/entities/${entity}`);
   const dispatch = useDispatch();
-  const { displayNotification } = useNotification();
 
   const [array, setArray] = useState<{ field: string; value: string | Blob }[]>(
     []
   );
+
+  const [selected, setSelected] = useState(false);
 
   React.useEffect(() => {
     setArray(data);
   }, [data]);
 
   return (
-    <>
-      <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <CardContent sx={{ flexGrow: 1 }}>
-          <Tooltip title={data.label} placement={'top'}>
-            {data.type === 'video' ? (
-              <YouTubeIcon sx={{ fontSize: 30 }} />
-            ) : (
-              <UserIcon sx={{ fontSize: 30 }} />
-            )}
-          </Tooltip>
-        </CardContent>
-      </Card>
+    <div
+      style={{
+        backgroundColor: data.type === 'channel' ? 'rgba(171,205,239,0.9)' : 'rgba(255,193,204,0.9)',
+        padding: '14px',
+        borderRadius: '50px',
+        height: '50px',
+        boxShadow: selected ? '0 0 0 2px #000' : '0 0 0 2px #e0e0e0',
+      }}
+      onSelect={() => setSelected(true)}
+    >
+      <Tooltip title={data.label} placement={'top'}>
+        {data.type === 'video' ? (
+          <YouTubeIcon
+            sx={{ fontSize: 22.5 }}
+            color={'error'}
+            onClick={() => navigateToEntityPage(data.id)}
+          />
+        ) : (
+          <UserIcon
+            sx={{ fontSize: 22.5 }}
+            color={'secondary'}
+            onClick={() => dispatch(toggleDrawer({ id: data.label }))}
+          />
+        )}
+      </Tooltip>
 
-      <Handle type="target" position={Position.Left} />
-      <Handle type="source" position={Position.Right} />
-    </>
+      {data.type === 'video' && (
+        <Handle type={'target'} position={Position.Left} />
+      )}
+      <Handle
+        type={'source'}
+        position={Position.Right}
+        isConnectable={data.type !== 'channel'}
+      />
+    </div>
   );
 };
 

@@ -2,7 +2,7 @@
 const dagre = require('dagre');
 
 const nodeWidth = 50;
-const nodeHeight = 115;
+const nodeHeight = 50;
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -95,7 +95,7 @@ function handleLoop(node: { id: any; nodes: any[]; next: any }) {
       style: {
         height: `${(node.nodes.length + 1) * 110}px`,
         width: `${nodeWidth}px`,
-        backgroundColor: 'rgba(255, 26, 224, 0.2)',
+        backgroundColor: 'rgba(255, 255, 255, 0)',
       },
       next: node.next,
     },
@@ -184,13 +184,14 @@ function getNode(node: any) {
     type: 'customNode',
     next: next,
     data: {
+      id: node.id,
       label: label,
       type: node.data.type,
     },
     position: { x: 0, y: 0 },
     style: {
       width: `${nodeWidth}px`,
-      backgroundColor: 'rgba(255, 26, 224, 0.2)',
+      backgroundColor: 'rgba(255, 255, 255, 0)',
     },
     stroke: node.stroke,
   };

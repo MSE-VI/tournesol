@@ -1,15 +1,57 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Container, Input } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  CardMedia,
+  Container,
+  Divider,
+  Drawer,
+  Grid,
+  Typography,
+} from '@mui/material';
 import { ContentHeader } from 'src/components';
 import { FullScreen, useFullScreenHandle } from 'react-full-screen';
 import { Fullscreen } from '@mui/icons-material';
 import Board from 'src/components/Board/Board';
 import { getUserComparisons } from '../../../utils/api/comparisons';
 import { useCurrentPoll } from '../../../hooks';
-import { VideoService } from '../../../services/openapi';
+import {
+  PaginatedRecommendationList,
+  PollsService,
+  VideoService,
+} from '../../../services/openapi';
+import { styled } from '@mui/styles';
+import { useAppSelector } from '../../../app/hooks';
+import {
+  closeDrawer,
+  selectFrameDrawerId,
+  selectFrameDrawerOpen,
+} from '../../../utils/reducers/drawerSlice';
+import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+
+const drawerWidth = 390;
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  margin: theme.spacing(2, 0),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-start',
+}));
 
 const GraphPage = () => {
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const navigateToEntityPage = (entity: string) =>
+    history.push(`/entities/${entity}`);
   const { t } = useTranslation();
   const handle = useFullScreenHandle();
   const { name: pollName } = useCurrentPoll();
@@ -20,22 +62,46 @@ const GraphPage = () => {
     nodes: [],
   });
 
+  const drawerOpen = useAppSelector(selectFrameDrawerOpen);
+  const drawerId = useAppSelector(selectFrameDrawerId);
+
   const [ready, setReady] = React.useState(false);
+
+  const [uploaderVideos, setUploaderVideos] =
+    React.useState<PaginatedRecommendationList>({ results: [], count: 0 });
 
   const delay = (ms: number) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
 
+  const retrieveVideos = async () => {
+    if (drawerId === '') {
+      setUploaderVideos({ results: [], count: 0 });
+    }
+    const videos = await PollsService.pollsRecommendationsList({
+      name: 'videos',
+      limit: 25,
+      unsafe: true,
+      metadata: {
+        uploader: drawerId,
+      },
+    });
+    if (videos) {
+      setUploaderVideos(videos);
+    }
+  };
+
   const getComparisons = async () => {
-    const SIZE = 20;
+    setReady(false);
+    const SIZE = 10;
     const response = await getUserComparisons(pollName, 1000);
-    // get 20 comparisons from response starting randomly
     const randomIndex = Math.floor(Math.random() * (response.length - SIZE));
     const randomComparisons = response.slice(randomIndex, randomIndex + SIZE);
     setComparisons(randomComparisons);
   };
 
   const constructVideos = async () => {
+    dispatch(closeDrawer());
     if (comparisons.length === 0) {
       const listWithoutDuplicatesNext = list.nodes;
       listWithoutDuplicatesNext.forEach((node: any) => {
@@ -86,8 +152,7 @@ const GraphPage = () => {
           }),
         };
       });
-    }
-    else if (
+    } else if (
       list.nodes.filter((n: any) => n.id === item.entity_a.uid).length !== 0 &&
       list.nodes.filter((n: any) => n.id === item.entity_b.uid).length === 0
     ) {
@@ -109,14 +174,14 @@ const GraphPage = () => {
                 type: 'node',
                 id: item.entity_b.uid,
                 next: [],
-                data: {label: item.entity_b.metadata.name, type: 'video'},
+                data: { label: item.entity_b.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
               {
                 type: 'node',
                 id: video2.uploader,
                 next: [item.entity_b.uid],
-                data: {label: video2.uploader, type: 'channel'},
+                data: { label: video2.uploader, type: 'channel' },
                 stroke: 'red',
               },
             ]),
@@ -144,7 +209,7 @@ const GraphPage = () => {
               type: 'node',
               id: item.entity_b.uid,
               next: [],
-              data: {label: item.entity_b.metadata.name, type: 'video'},
+              data: { label: item.entity_b.metadata.name, type: 'video' },
               stroke: 'blue',
             },
           ]),
@@ -172,14 +237,14 @@ const GraphPage = () => {
                 type: 'node',
                 id: item.entity_a.uid,
                 next: [],
-                data: {label: item.entity_a.metadata.name, type: 'video'},
+                data: { label: item.entity_a.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
               {
                 type: 'node',
                 id: video.uploader,
                 next: [item.entity_a.uid],
-                data: {label: video.uploader, type: 'channel'},
+                data: { label: video.uploader, type: 'channel' },
                 stroke: 'red',
               },
             ]),
@@ -209,7 +274,7 @@ const GraphPage = () => {
                 type: 'node',
                 id: item.entity_a.uid,
                 next: [],
-                data: {label: item.entity_a.metadata.name, type: 'video'},
+                data: { label: item.entity_a.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
             ]),
@@ -226,28 +291,28 @@ const GraphPage = () => {
                 type: 'node',
                 id: item.entity_a.uid,
                 next: [item.entity_b.uid],
-                data: {label: item.entity_a.metadata.name, type: 'video'},
+                data: { label: item.entity_a.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
               {
                 type: 'node',
                 id: item.entity_b.uid,
                 next: [],
-                data: {label: item.entity_b.metadata.name, type: 'video'},
+                data: { label: item.entity_b.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
               {
                 type: 'node',
                 id: video.uploader,
                 next: [item.entity_a.uid],
-                data: {label: video.uploader, type: 'channel'},
+                data: { label: video.uploader, type: 'channel' },
                 stroke: 'red',
               },
               {
                 type: 'node',
                 id: video2.uploader,
                 next: [item.entity_b.uid],
-                data: {label: video2.uploader, type: 'channel'},
+                data: { label: video2.uploader, type: 'channel' },
                 stroke: 'red',
               },
             ],
@@ -261,24 +326,23 @@ const GraphPage = () => {
                 type: 'node',
                 id: item.entity_a.uid,
                 next: [item.entity_b.uid],
-                data: {label: item.entity_a.metadata.name, type: 'video'},
+                data: { label: item.entity_a.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
               {
                 type: 'node',
                 id: item.entity_b.uid,
                 next: [],
-                data: {label: item.entity_b.metadata.name, type: 'video'},
+                data: { label: item.entity_b.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
               {
                 type: 'node',
                 id: video.uploader,
                 next: [item.entity_a.uid],
-                data: {label: video.uploader, type: 'channel'},
+                data: { label: video.uploader, type: 'channel' },
                 stroke: 'red',
               },
-              // add b to existing video2.uploader next list
               {
                 ...filteredData2[0],
                 next: [...filteredData2[0].next, item.entity_b.uid],
@@ -294,17 +358,16 @@ const GraphPage = () => {
                 type: 'node',
                 id: item.entity_a.uid,
                 next: [item.entity_b.uid],
-                data: {label: item.entity_a.metadata.name, type: 'video'},
+                data: { label: item.entity_a.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
               {
                 type: 'node',
                 id: item.entity_b.uid,
                 next: [],
-                data: {label: item.entity_b.metadata.name, type: 'video'},
+                data: { label: item.entity_b.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
-              // add a to existing video.uploader next list
               {
                 ...filteredData1[0],
                 next: [...filteredData1[0].next, item.entity_a.uid],
@@ -313,13 +376,12 @@ const GraphPage = () => {
                 type: 'node',
                 id: video2.uploader,
                 next: [item.entity_b.uid],
-                data: {label: video2.uploader, type: 'channel'},
+                data: { label: video2.uploader, type: 'channel' },
                 stroke: 'red',
               },
             ],
           };
-        }
-        else {
+        } else {
           return {
             ...prev,
             nodes: [
@@ -328,14 +390,14 @@ const GraphPage = () => {
                 type: 'node',
                 id: item.entity_a.uid,
                 next: [item.entity_b.uid],
-                data: {label: item.entity_a.metadata.name, type: 'video'},
+                data: { label: item.entity_a.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
               {
                 type: 'node',
                 id: item.entity_b.uid,
                 next: [],
-                data: {label: item.entity_b.metadata.name, type: 'video'},
+                data: { label: item.entity_b.metadata.name, type: 'video' },
                 stroke: 'blue',
               },
               // add a to existing video.uploader next list
@@ -364,6 +426,10 @@ const GraphPage = () => {
   React.useEffect(() => {
     constructVideos();
   }, [comparisons]);
+
+  React.useEffect(() => {
+    retrieveVideos();
+  }, [drawerId]);
 
   return (
     <>
@@ -397,6 +463,52 @@ const GraphPage = () => {
             <Board nodesList={list} ready={ready} />
           </Box>
         </FullScreen>
+
+        <Drawer
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+            },
+            overflow: 'scroll',
+          }}
+          variant="persistent"
+          anchor="right"
+          open={drawerOpen}
+        >
+          <DrawerHeader />
+          <Container sx={{ mt: 1 }}>
+            <Typography variant={'h5'} align={'justify'}>{drawerId}</Typography>
+            <Grid container spacing={2} sx={{ mt: 2 }}>
+              {uploaderVideos.results?.map((video) => (
+                <Grid item xs={12} key={video?.metadata?.video_id}>
+                  <Card>
+                    <CardHeader title={video?.metadata?.name} />
+                    <CardContent>
+                      <Typography variant="body1" color="text.secondary">
+                        Comparisons: {video?.n_comparisons}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Uploaded on: {video?.metadata?.publication_date}
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Button
+                        size="small"
+                        onClick={() => navigateToEntityPage(video?.uid)}
+                        color={'secondary'}
+                        variant={'outlined'}
+                      >
+                        View
+                      </Button>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        </Drawer>
       </Container>
     </>
   );
