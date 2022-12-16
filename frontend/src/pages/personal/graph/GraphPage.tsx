@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { ContentHeader } from 'src/components';
 import { FullScreen, useFullScreenHandle } from 'react-full-screen';
-import { Fullscreen } from '@mui/icons-material';
+import { Compare, Fullscreen } from '@mui/icons-material';
 import Board from 'src/components/Board/Board';
 import { getUserComparisons } from '../../../utils/api/comparisons';
 import { useCurrentPoll } from '../../../hooks';
@@ -33,7 +33,7 @@ import {
   selectFrameDrawerId,
   selectFrameDrawerOpen,
 } from '../../../utils/reducers/drawerSlice';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, Link as RouterLink } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import VideoCard from 'src/features/videos/VideoCard';
 
@@ -56,7 +56,7 @@ const GraphPage = () => {
     history.push(`/entities/${entity}`);
   const { t } = useTranslation();
   const handle = useFullScreenHandle();
-  const { name: pollName } = useCurrentPoll();
+  const { baseUrl, name: pollName } = useCurrentPoll();
 
   const [comparisons, setComparisons] = React.useState<any[]>([]);
 
@@ -493,6 +493,7 @@ const GraphPage = () => {
                 VideoService.videoRetrieve({
                   videoId: node.id.split('yt:')[1],
                 }).then((video) => {
+                  setRecommendedVideo(null);
                   setSelectedVideo(video);
                 });
               }}
@@ -501,12 +502,32 @@ const GraphPage = () => {
         </FullScreen>
 
         {selectedVideo && (
-          <VideoCard video={selectedVideo} actions={[]} showPlayer={false} />
+          <>
+            <VideoCard video={selectedVideo} actions={[]} showPlayer={false} />
+            {recommendedVideo ? (
+              <>
+                <VideoCard
+                  video={recommendedVideo}
+                  actions={[]}
+                  showPlayer={false}
+                />
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  endIcon={<Compare />}
+                  component={RouterLink}
+                  to={`${baseUrl}/comparison?uidA=${selectedVideo.uid}&uidB=${recommendedVideo.uid}`}
+                >
+                  {t('entityAnalysisPage.generic.compare')}
+                </Button>
+              </>
+            ) : (
+              <Typography variant={'h5'} align={'center'}>
+                Loading video to compare
+              </Typography>
+            )}
+          </>
         )}
-        {selectedVideo && recommendedVideo && (
-          <VideoCard video={recommendedVideo} actions={[]} showPlayer={false} />
-        )}
-        {selectedVideo && !recommendedVideo && <Button>Loading...</Button>}
 
         <Drawer
           sx={{
