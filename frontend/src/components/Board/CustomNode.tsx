@@ -39,8 +39,6 @@ const CustomNode = ({ data, styles, selected }: any) => {
       onClick={() => {
         if (data.onClickHandler) {
           data.onClickHandler();
-        } else {
-          navigateToEntityPage(data.id);
         }
       }}
     >
