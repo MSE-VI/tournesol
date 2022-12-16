@@ -150,16 +150,19 @@ const GraphPage = () => {
     const video2 = await VideoService.videoRetrieve({
       videoId: item.entity_b.uid.split('yt:')[1],
     });
-    const filteredData1 = list.nodes.filter(
+    const videosFromChannelA = list.nodes.filter(
       (node: any) => node.id === video.uploader
     );
-    const filteredData2 = list.nodes.filter(
+    const videosFromChannelB = list.nodes.filter(
       (node: any) => node.id === video2.uploader
     );
-    if (
-      list.nodes.filter((n: any) => n.id === item.entity_a.uid).length !== 0 &&
-      list.nodes.filter((n: any) => n.id === item.entity_b.uid).length !== 0
-    ) {
+
+    const videoAExists =
+      list.nodes.filter((n: any) => n.id === item.entity_a.uid).length !== 0;
+    const videoBExists =
+      list.nodes.filter((n: any) => n.id === item.entity_b.uid).length !== 0;
+
+    if (videoAExists && videoBExists) {
       setList((prev: any) => {
         return {
           ...prev,
@@ -177,10 +180,7 @@ const GraphPage = () => {
           }),
         };
       });
-    } else if (
-      list.nodes.filter((n: any) => n.id === item.entity_a.uid).length !== 0 &&
-      list.nodes.filter((n: any) => n.id === item.entity_b.uid).length === 0
-    ) {
+    } else if (videoAExists && !videoBExists) {
       setList((prev: any) => {
         let array = prev.nodes.map((n: any) => {
           if (n.id === item.entity_a.uid) {
@@ -191,7 +191,7 @@ const GraphPage = () => {
           }
           return n;
         });
-        if (filteredData2.length === 0) {
+        if (videosFromChannelB.length === 0) {
           return {
             ...prev,
             nodes: array.concat([
@@ -220,10 +220,7 @@ const GraphPage = () => {
           nodes: array.concat([constructVideoNode(item.entity_b, [])]),
         };
       });
-    } else if (
-      list.nodes.filter((n: any) => n.id === item.entity_a.uid).length === 0 &&
-      list.nodes.filter((n: any) => n.id === item.entity_b.uid).length !== 0
-    ) {
+    } else if (!videoAExists && videoBExists) {
       setList((prev: any) => {
         let array = prev.nodes.map((n: any) => {
           if (n.id === item.entity_b.uid) {
@@ -234,7 +231,7 @@ const GraphPage = () => {
           }
           return n;
         });
-        if (filteredData1.length === 0) {
+        if (videosFromChannelA.length === 0) {
           return {
             ...prev,
             nodes: array.concat([
@@ -267,7 +264,10 @@ const GraphPage = () => {
       });
     } else {
       setList((prev: any) => {
-        if (filteredData1.length === 0 && filteredData2.length === 0) {
+        if (
+          videosFromChannelA.length === 0 &&
+          videosFromChannelB.length === 0
+        ) {
           return {
             ...prev,
             nodes: [
@@ -278,7 +278,7 @@ const GraphPage = () => {
               constructChannelNode(video2.uploader, item.entity_b.uid),
             ],
           };
-        } else if (filteredData1.length === 0) {
+        } else if (videosFromChannelA.length === 0) {
           return {
             ...prev,
             nodes: [
@@ -287,12 +287,12 @@ const GraphPage = () => {
               constructVideoNode(item.entity_b, []),
               constructChannelNode(video.uploader, item.entity_a.uid),
               {
-                ...filteredData2[0],
-                next: [...filteredData2[0].next, item.entity_b.uid],
+                ...videosFromChannelB[0],
+                next: [...videosFromChannelB[0].next, item.entity_b.uid],
               },
             ],
           };
-        } else if (filteredData2.length === 0) {
+        } else if (videosFromChannelB.length === 0) {
           return {
             ...prev,
             nodes: [
@@ -300,8 +300,8 @@ const GraphPage = () => {
               constructVideoNode(item.entity_a, [item.entity_b.uid]),
               constructVideoNode(item.entity_b, []),
               {
-                ...filteredData1[0],
-                next: [...filteredData1[0].next, item.entity_a.uid],
+                ...videosFromChannelA[0],
+                next: [...videosFromChannelA[0].next, item.entity_a.uid],
               },
               constructChannelNode(video2.uploader, item.entity_b.uid),
             ],
@@ -315,13 +315,13 @@ const GraphPage = () => {
               constructVideoNode(item.entity_b, []),
               // add a to existing video.uploader next list
               {
-                ...filteredData1[0],
-                next: [...filteredData1[0].next, item.entity_a.uid],
+                ...videosFromChannelA[0],
+                next: [...videosFromChannelA[0].next, item.entity_a.uid],
               },
               // add b to existing video2.uploader next list
               {
-                ...filteredData2[0],
-                next: [...filteredData2[0].next, item.entity_b.uid],
+                ...videosFromChannelB[0],
+                next: [...videosFromChannelB[0].next, item.entity_b.uid],
               },
             ],
           };
