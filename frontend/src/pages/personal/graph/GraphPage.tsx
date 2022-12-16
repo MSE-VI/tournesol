@@ -105,6 +105,26 @@ const GraphPage = () => {
     setComparisons(response);
   };
 
+  const constructVideoNode = (video: any, next: any[]) => {
+    return {
+      type: 'node',
+      id: video.uid,
+      next: next,
+      data: { label: video.metadata.name, type: 'video' },
+      stroke: 'blue',
+    };
+  };
+
+  const constructChannelNode = (channelId: any, videoUid: string) => {
+    return {
+      type: 'node',
+      id: channelId,
+      next: [videoUid],
+      data: { label: channelId, type: 'channel' },
+      stroke: 'red',
+    };
+  };
+
   const constructVideos = async () => {
     dispatch(closeDrawer());
     if (comparisons.length === 0) {
@@ -175,20 +195,8 @@ const GraphPage = () => {
           return {
             ...prev,
             nodes: array.concat([
-              {
-                type: 'node',
-                id: item.entity_b.uid,
-                next: [],
-                data: { label: item.entity_b.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
-              {
-                type: 'node',
-                id: video2.uploader,
-                next: [item.entity_b.uid],
-                data: { label: video2.uploader, type: 'channel' },
-                stroke: 'red',
-              },
+              constructVideoNode(item.entity_b, []),
+              constructChannelNode(video2.uploader, item.entity_b.uid),
             ]),
           };
         }
@@ -209,15 +217,7 @@ const GraphPage = () => {
         });
         return {
           ...prev,
-          nodes: array.concat([
-            {
-              type: 'node',
-              id: item.entity_b.uid,
-              next: [],
-              data: { label: item.entity_b.metadata.name, type: 'video' },
-              stroke: 'blue',
-            },
-          ]),
+          nodes: array.concat([constructVideoNode(item.entity_b, [])]),
         };
       });
     } else if (
@@ -238,20 +238,8 @@ const GraphPage = () => {
           return {
             ...prev,
             nodes: array.concat([
-              {
-                type: 'node',
-                id: item.entity_a.uid,
-                next: [],
-                data: { label: item.entity_a.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
-              {
-                type: 'node',
-                id: video.uploader,
-                next: [item.entity_a.uid],
-                data: { label: video.uploader, type: 'channel' },
-                stroke: 'red',
-              },
+              constructVideoNode(item.entity_a, []),
+              constructChannelNode(video.uploader, item.entity_a.uid),
             ]),
           };
         }
@@ -274,15 +262,7 @@ const GraphPage = () => {
           ...prev,
           nodes:
             // add to array
-            array.concat([
-              {
-                type: 'node',
-                id: item.entity_a.uid,
-                next: [],
-                data: { label: item.entity_a.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
-            ]),
+            array.concat([constructVideoNode(item.entity_a, [])]),
         };
       });
     } else {
@@ -292,34 +272,10 @@ const GraphPage = () => {
             ...prev,
             nodes: [
               ...prev.nodes,
-              {
-                type: 'node',
-                id: item.entity_a.uid,
-                next: [item.entity_b.uid],
-                data: { label: item.entity_a.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
-              {
-                type: 'node',
-                id: item.entity_b.uid,
-                next: [],
-                data: { label: item.entity_b.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
-              {
-                type: 'node',
-                id: video.uploader,
-                next: [item.entity_a.uid],
-                data: { label: video.uploader, type: 'channel' },
-                stroke: 'red',
-              },
-              {
-                type: 'node',
-                id: video2.uploader,
-                next: [item.entity_b.uid],
-                data: { label: video2.uploader, type: 'channel' },
-                stroke: 'red',
-              },
+              constructVideoNode(item.entity_a, [item.entity_b.uid]),
+              constructVideoNode(item.entity_b, []),
+              constructChannelNode(video.uploader, item.entity_a.uid),
+              constructChannelNode(video2.uploader, item.entity_b.uid),
             ],
           };
         } else if (filteredData1.length === 0) {
@@ -327,27 +283,9 @@ const GraphPage = () => {
             ...prev,
             nodes: [
               ...prev.nodes,
-              {
-                type: 'node',
-                id: item.entity_a.uid,
-                next: [item.entity_b.uid],
-                data: { label: item.entity_a.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
-              {
-                type: 'node',
-                id: item.entity_b.uid,
-                next: [],
-                data: { label: item.entity_b.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
-              {
-                type: 'node',
-                id: video.uploader,
-                next: [item.entity_a.uid],
-                data: { label: video.uploader, type: 'channel' },
-                stroke: 'red',
-              },
+              constructVideoNode(item.entity_a, [item.entity_b.uid]),
+              constructVideoNode(item.entity_b, []),
+              constructChannelNode(video.uploader, item.entity_a.uid),
               {
                 ...filteredData2[0],
                 next: [...filteredData2[0].next, item.entity_b.uid],
@@ -359,31 +297,13 @@ const GraphPage = () => {
             ...prev,
             nodes: [
               ...prev.nodes,
-              {
-                type: 'node',
-                id: item.entity_a.uid,
-                next: [item.entity_b.uid],
-                data: { label: item.entity_a.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
-              {
-                type: 'node',
-                id: item.entity_b.uid,
-                next: [],
-                data: { label: item.entity_b.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
+              constructVideoNode(item.entity_a, [item.entity_b.uid]),
+              constructVideoNode(item.entity_b, []),
               {
                 ...filteredData1[0],
                 next: [...filteredData1[0].next, item.entity_a.uid],
               },
-              {
-                type: 'node',
-                id: video2.uploader,
-                next: [item.entity_b.uid],
-                data: { label: video2.uploader, type: 'channel' },
-                stroke: 'red',
-              },
+              constructChannelNode(video2.uploader, item.entity_b.uid),
             ],
           };
         } else {
@@ -391,20 +311,8 @@ const GraphPage = () => {
             ...prev,
             nodes: [
               ...prev.nodes,
-              {
-                type: 'node',
-                id: item.entity_a.uid,
-                next: [item.entity_b.uid],
-                data: { label: item.entity_a.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
-              {
-                type: 'node',
-                id: item.entity_b.uid,
-                next: [],
-                data: { label: item.entity_b.metadata.name, type: 'video' },
-                stroke: 'blue',
-              },
+              constructVideoNode(item.entity_a, [item.entity_b.uid]),
+              constructVideoNode(item.entity_b, []),
               // add a to existing video.uploader next list
               {
                 ...filteredData1[0],
