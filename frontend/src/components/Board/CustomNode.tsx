@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { toggleDrawer } from '../../utils/reducers/drawerSlice';
 import { useHistory } from 'react-router-dom';
 
-const CustomNode = ({ data, styles }: any) => {
+const CustomNode = ({ data, styles, selected }: any) => {
   const history = useHistory();
   const navigateToEntityPage = (entity: string) =>
     history.push(`/entities/${entity}`);
@@ -18,7 +18,7 @@ const CustomNode = ({ data, styles }: any) => {
     []
   );
 
-  const [selected, setSelected] = useState(false);
+  //const [selected, setSelected] = useState(false);
 
   React.useEffect(() => {
     setArray(data);
@@ -36,19 +36,17 @@ const CustomNode = ({ data, styles }: any) => {
         height: '50px',
         boxShadow: selected ? '0 0 0 2px #000' : '0 0 0 2px #e0e0e0',
       }}
-      onSelect={() => setSelected(true)}
+      onClick={() => {
+        if (data.onClickHandler) {
+          data.onClickHandler();
+        } else {
+          navigateToEntityPage(data.id);
+        }
+      }}
     >
       <Tooltip title={data.label} placement={'top'}>
         {data.type === 'video' ? (
-          <YouTubeIcon
-            sx={{ fontSize: 22.5 }}
-            color={'error'}
-            onClick={() =>
-              data.onClickHandler
-                ? data.onClickHandler()
-                : navigateToEntityPage(data.id)
-            }
-          />
+          <YouTubeIcon sx={{ fontSize: 22.5 }} color={'error'} />
         ) : (
           <UserIcon
             sx={{ fontSize: 22.5 }}

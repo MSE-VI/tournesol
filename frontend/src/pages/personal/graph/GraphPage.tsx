@@ -488,13 +488,23 @@ const GraphPage = () => {
             <Board
               nodesList={list}
               ready={ready}
-              onClickHandler={(i) => {
-                const node = list.nodes[i];
+              onClickHandler={(idx) => {
+                const node = list.nodes[idx];
                 VideoService.videoRetrieve({
                   videoId: node.id.split('yt:')[1],
                 }).then((video) => {
+                  // Clear previous state
                   setRecommendedVideo(null);
-                  setSelectedVideo(video);
+                  if (selectedVideo) {
+                    list.nodes[selectedVideo.nodeIdx].selected = false;
+                  }
+
+                  // Set new state
+                  list.nodes[idx].selected = true;
+                  setSelectedVideo({
+                    video: video,
+                    nodeIdx: idx,
+                  });
                 });
               }}
             />
@@ -503,7 +513,11 @@ const GraphPage = () => {
 
         {selectedVideo && (
           <>
-            <VideoCard video={selectedVideo} actions={[]} showPlayer={false} />
+            <VideoCard
+              video={selectedVideo.video}
+              actions={[]}
+              showPlayer={false}
+            />
             {recommendedVideo ? (
               <>
                 <VideoCard
@@ -516,7 +530,7 @@ const GraphPage = () => {
                   variant="contained"
                   endIcon={<Compare />}
                   component={RouterLink}
-                  to={`${baseUrl}/comparison?uidA=${selectedVideo.uid}&uidB=${recommendedVideo.uid}`}
+                  to={`${baseUrl}/comparison?uidA=${selectedVideo.video.uid}&uidB=${recommendedVideo.uid}`}
                 >
                   {t('entityAnalysisPage.generic.compare')}
                 </Button>

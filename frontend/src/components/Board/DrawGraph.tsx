@@ -191,13 +191,14 @@ function getNode(node: any, onClickHandler: () => void) {
       id: node.id,
       label: label,
       type: node.data.type,
-      onClickHandler: onClickHandler,
+      onClickHandler: node.data.type == 'video' ? onClickHandler : null,
     },
     position: { x: 0, y: 0 },
     style: {
       width: `${nodeWidth}px`,
       backgroundColor: 'rgba(255, 255, 255, 0)',
     },
+    selected: false,
     stroke: node.stroke,
   };
 }
