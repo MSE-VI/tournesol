@@ -346,7 +346,7 @@ const GraphPage = () => {
 
     UsersService.usersMeEntitiesToCompareList({
       pollName: pollName,
-      firstEntityUid: selectedVideo.uid,
+      firstEntityUid: selectedVideo.video.uid,
       limit: 1,
     }).then((entities) => {
       if (entities.results && entities.results.length >= 1) {
