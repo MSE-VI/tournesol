@@ -115,12 +115,12 @@ const GraphPage = () => {
     };
   };
 
-  const constructChannelNode = (channelId: any, videoUid: string) => {
+  const constructChannelNode = (video: any) => {
     return {
       type: 'node',
-      id: channelId,
-      next: [videoUid],
-      data: { label: channelId, type: 'channel' },
+      id: video.metadata.uploader,
+      next: [video.uid],
+      data: { label: video.metadata.uploader, type: 'channel' },
       stroke: 'red',
     };
   };
@@ -144,17 +144,12 @@ const GraphPage = () => {
     }
     setReady(false);
     const item = comparisons[0];
-    const video = await VideoService.videoRetrieve({
-      videoId: item.entity_a.uid.split('yt:')[1],
-    });
-    const video2 = await VideoService.videoRetrieve({
-      videoId: item.entity_b.uid.split('yt:')[1],
-    });
+
     const videosFromChannelA = list.nodes.filter(
-      (node: any) => node.id === video.uploader
+      (node: any) => node.id === item.entity_a.metadata.uploader
     );
     const videosFromChannelB = list.nodes.filter(
-      (node: any) => node.id === video2.uploader
+      (node: any) => node.id === item.entity_b.metadata.uploader
     );
 
     const videoAExists =
@@ -196,7 +191,7 @@ const GraphPage = () => {
             ...prev,
             nodes: array.concat([
               constructVideoNode(item.entity_b, []),
-              constructChannelNode(video2.uploader, item.entity_b.uid),
+              constructChannelNode(item.entity_b),
             ]),
           };
         }
@@ -207,7 +202,7 @@ const GraphPage = () => {
               next: [...n.next, item.entity_b.uid],
             };
           }
-          if (n.id === video2.uploader) {
+          if (n.id === item.entity_b.uploader) {
             return {
               ...n,
               next: [...n.next, item.entity_b.uid],
@@ -236,7 +231,7 @@ const GraphPage = () => {
             ...prev,
             nodes: array.concat([
               constructVideoNode(item.entity_a, []),
-              constructChannelNode(video.uploader, item.entity_a.uid),
+              constructChannelNode(item.entity_a),
             ]),
           };
         }
@@ -247,7 +242,7 @@ const GraphPage = () => {
               next: [...n.next, item.entity_a.uid],
             };
           }
-          if (n.id === video.uploader) {
+          if (n.id === item.entity_a.uploader) {
             return {
               ...n,
               next: [...n.next, item.entity_a.uid],
@@ -274,8 +269,8 @@ const GraphPage = () => {
               ...prev.nodes,
               constructVideoNode(item.entity_a, [item.entity_b.uid]),
               constructVideoNode(item.entity_b, []),
-              constructChannelNode(video.uploader, item.entity_a.uid),
-              constructChannelNode(video2.uploader, item.entity_b.uid),
+              constructChannelNode(item.entity_a),
+              constructChannelNode(item.entity_b),
             ],
           };
         } else if (videosFromChannelA.length === 0) {
@@ -285,7 +280,7 @@ const GraphPage = () => {
               ...prev.nodes,
               constructVideoNode(item.entity_a, [item.entity_b.uid]),
               constructVideoNode(item.entity_b, []),
-              constructChannelNode(video.uploader, item.entity_a.uid),
+              constructChannelNode(item.entity_a),
               {
                 ...videosFromChannelB[0],
                 next: [...videosFromChannelB[0].next, item.entity_b.uid],
@@ -303,7 +298,7 @@ const GraphPage = () => {
                 ...videosFromChannelA[0],
                 next: [...videosFromChannelA[0].next, item.entity_a.uid],
               },
-              constructChannelNode(video2.uploader, item.entity_b.uid),
+              constructChannelNode(item.entity_b),
             ],
           };
         } else {

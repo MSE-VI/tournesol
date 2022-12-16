@@ -66,7 +66,7 @@ class ComparisonListBaseApi(
         """
         queryset = Comparison.objects.filter(
             poll=self.poll_from_url, user=self.request.user
-        ).order_by("-datetime_lastedit")
+        ).select_related('entity_1', 'entity_2').order_by("-datetime_lastedit")
 
         if self.kwargs.get("uid"):
             uid = self.kwargs.get("uid")
