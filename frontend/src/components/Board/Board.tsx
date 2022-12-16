@@ -80,7 +80,7 @@ const Board: React.FC<{ nodesList: any; ready: boolean }> = ({
           <Background />
         </ReactFlow>
       ) : (
-        <CircularProgress sx={{ mt: 2, ml: 2}} />
+        <CircularProgress sx={{ mt: 2, ml: 2 }} />
       )}
     </ReactFlowProvider>
   );

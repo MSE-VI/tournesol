@@ -36,6 +36,8 @@ const SelectorPopper = ({
   }
   return (
     <Popper
+      onResize={undefined}
+      onResizeCapture={undefined}
       open={open}
       {...rest}
       style={{ width: 'fit-content' }}

@@ -479,7 +479,9 @@ const GraphPage = () => {
         >
           <DrawerHeader />
           <Container sx={{ mt: 1 }}>
-            <Typography variant={'h5'} align={'justify'}>{drawerId}</Typography>
+            <Typography variant={'h5'} align={'justify'}>
+              {drawerId}
+            </Typography>
             <Grid container spacing={2} sx={{ mt: 2 }}>
               {uploaderVideos.results?.map((video) => (
                 <Grid item xs={12} key={video?.metadata?.video_id}>

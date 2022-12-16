@@ -27,7 +27,10 @@ const CustomNode = ({ data, styles }: any) => {
   return (
     <div
       style={{
-        backgroundColor: data.type === 'channel' ? 'rgba(171,205,239,0.9)' : 'rgba(255,193,204,0.9)',
+        backgroundColor:
+          data.type === 'channel'
+            ? 'rgba(171,205,239,0.9)'
+            : 'rgba(255,193,204,0.9)',
         padding: '14px',
         borderRadius: '50px',
         height: '50px',
