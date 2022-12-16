@@ -23,6 +23,7 @@ import { useCurrentPoll } from '../../../hooks';
 import {
   PaginatedRecommendationList,
   PollsService,
+  UsersService,
   VideoService,
 } from '../../../services/openapi';
 import { styled } from '@mui/styles';
@@ -32,8 +33,9 @@ import {
   selectFrameDrawerId,
   selectFrameDrawerOpen,
 } from '../../../utils/reducers/drawerSlice';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import VideoCard from 'src/features/videos/VideoCard';
 
 const drawerWidth = 390;
 
@@ -61,6 +63,9 @@ const GraphPage = () => {
   const [list, setList] = React.useState<any>({
     nodes: [],
   });
+
+  const [selectedVideo, setSelectedVideo] = React.useState<any>(null);
+  const [recommendedVideo, setRecommendedVideo] = React.useState<any>(null);
 
   const drawerOpen = useAppSelector(selectFrameDrawerOpen);
   const drawerId = useAppSelector(selectFrameDrawerId);
@@ -97,7 +102,7 @@ const GraphPage = () => {
     const response = await getUserComparisons(pollName, 1000);
     const randomIndex = Math.floor(Math.random() * (response.length - SIZE));
     const randomComparisons = response.slice(randomIndex, randomIndex + SIZE);
-    setComparisons(randomComparisons);
+    setComparisons(response);
   };
 
   const constructVideos = async () => {
@@ -431,6 +436,26 @@ const GraphPage = () => {
     retrieveVideos();
   }, [drawerId]);
 
+  React.useEffect(() => {
+    if (selectedVideo === null) {
+      return;
+    }
+
+    UsersService.usersMeEntitiesToCompareList({
+      pollName: pollName,
+      firstEntityUid: selectedVideo.uid,
+      limit: 1,
+    }).then((entities) => {
+      if (entities.results && entities.results.length >= 1) {
+        VideoService.videoRetrieve({
+          videoId: entities.results[0].uid.split('yt:')[1],
+        }).then((video) => {
+          setRecommendedVideo(video);
+        });
+      }
+    });
+  }, [selectedVideo]);
+
   return (
     <>
       <ContentHeader title={t('myGraphPage.title')} />
@@ -460,9 +485,28 @@ const GraphPage = () => {
                   }
             }
           >
-            <Board nodesList={list} ready={ready} />
+            <Board
+              nodesList={list}
+              ready={ready}
+              onClickHandler={(i) => {
+                const node = list.nodes[i];
+                VideoService.videoRetrieve({
+                  videoId: node.id.split('yt:')[1],
+                }).then((video) => {
+                  setSelectedVideo(video);
+                });
+              }}
+            />
           </Box>
         </FullScreen>
+
+        {selectedVideo && (
+          <VideoCard video={selectedVideo} actions={[]} showPlayer={false} />
+        )}
+        {selectedVideo && recommendedVideo && (
+          <VideoCard video={recommendedVideo} actions={[]} showPlayer={false} />
+        )}
+        {selectedVideo && !recommendedVideo && <Button>Loading...</Button>}
 
         <Drawer
           sx={{

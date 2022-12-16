@@ -8,7 +8,8 @@ const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
 
 export default function DrawGraph(
-  serviceConfiguration: { nodes?: any } | null
+  serviceConfiguration: { nodes?: any } | null,
+  onClickHandler: (idx: any) => void
 ) {
   let nodes: any[] = [];
   let edges: any[] = [];
@@ -23,12 +24,12 @@ export default function DrawGraph(
       const node = nodesConfig[idx];
 
       if (node.type !== 'loop') {
-        const newNode = getNode(node);
+        const newNode = getNode(node, () => onClickHandler(idx));
         const newEdges = getEdge(newNode);
         nodes = [...nodes, newNode];
         edges = [...edges, newEdges];
       } else {
-        const newNodes = handleLoop(node);
+        const newNodes = handleLoop(node, () => onClickHandler(idx));
         nodes = nodes.concat(newNodes);
         edges = edges.concat(newNodes.map((n) => getEdge(n).flat()));
       }
@@ -86,7 +87,10 @@ const getAlignedElements = (nodes: any[], edges: any[]) => {
   return { nodes, edges };
 };
 
-function handleLoop(node: { id: any; nodes: any[]; next: any }) {
+function handleLoop(
+  node: { id: any; nodes: any[]; next: any },
+  onClickHandler: () => void
+) {
   const groupName = node.id;
   const startNodes = [
     {
@@ -111,7 +115,7 @@ function handleLoop(node: { id: any; nodes: any[]; next: any }) {
   ];
 
   const loopNodes = node.nodes.map((n) => {
-    const newNode: any = getNode(n);
+    const newNode: any = getNode(n, onClickHandler);
     newNode.parentNode = groupName;
     newNode.extent = 'parent';
     return newNode;
@@ -149,7 +153,7 @@ function getEdge(node: any) {
   return edges;
 }
 
-function getNode(node: any) {
+function getNode(node: any, onClickHandler: () => void) {
   let next: any[] = [];
   let label = node.data.label;
 
@@ -187,6 +191,7 @@ function getNode(node: any) {
       id: node.id,
       label: label,
       type: node.data.type,
+      onClickHandler: onClickHandler,
     },
     position: { x: 0, y: 0 },
     style: {

@@ -18,10 +18,11 @@ import './styles.css';
 import { CircularProgress } from '@mui/material';
 import { useCurrentPoll } from '../../hooks';
 
-const Board: React.FC<{ nodesList: any; ready: boolean }> = ({
-  nodesList,
-  ready,
-}) => {
+const Board: React.FC<{
+  nodesList: any;
+  ready: boolean;
+  onClickHandler: (idx: any) => void;
+}> = ({ nodesList, ready, onClickHandler }) => {
   const history = useHistory();
   const navigateToComparisonPage = (source: string, target: string) =>
     history.push(`/comparison?uidA=${source}&uidB=${target}`);
@@ -50,8 +51,10 @@ const Board: React.FC<{ nodesList: any; ready: boolean }> = ({
 
   useEffect(() => {
     if (ready) {
-      const { nodes: layoutedNodes, edges: layoutedEdges } =
-        DrawGraph(nodesList);
+      const { nodes: layoutedNodes, edges: layoutedEdges } = DrawGraph(
+        nodesList,
+        onClickHandler
+      );
       setNodes([...layoutedNodes]);
       setEdges([...layoutedEdges]);
     }

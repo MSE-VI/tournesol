@@ -43,7 +43,11 @@ const CustomNode = ({ data, styles }: any) => {
           <YouTubeIcon
             sx={{ fontSize: 22.5 }}
             color={'error'}
-            onClick={() => navigateToEntityPage(data.id)}
+            onClick={() =>
+              data.onClickHandler
+                ? data.onClickHandler()
+                : navigateToEntityPage(data.id)
+            }
           />
         ) : (
           <UserIcon
