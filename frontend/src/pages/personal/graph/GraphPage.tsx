@@ -2,14 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  CardMedia,
+  Button, Chip,
+  CircularProgress,
   Container,
-  Divider,
   Drawer,
   Grid,
   Typography,
@@ -33,9 +28,11 @@ import {
   selectFrameDrawerId,
   selectFrameDrawerOpen,
 } from '../../../utils/reducers/drawerSlice';
-import { useHistory, useParams, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import VideoCard from 'src/features/videos/VideoCard';
+import EntityList from '../../../features/entities/EntityList';
+import { contentHeaderHeight } from '../../../components/ContentHeader';
 
 const drawerWidth = 390;
 
@@ -43,7 +40,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: theme.spacing(0, 1),
-  margin: theme.spacing(2, 0),
+  margin: theme.spacing(1, 0),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
   justifyContent: 'flex-start',
@@ -51,9 +48,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 const GraphPage = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
-  const navigateToEntityPage = (entity: string) =>
-    history.push(`/entities/${entity}`);
   const { t } = useTranslation();
   const handle = useFullScreenHandle();
   const { baseUrl, name: pollName } = useCurrentPoll();
@@ -111,7 +105,7 @@ const GraphPage = () => {
       id: video.uid,
       next: next,
       data: { label: video.metadata.name, type: 'video' },
-      stroke: 'blue',
+      stroke: 'red',
     };
   };
 
@@ -121,7 +115,7 @@ const GraphPage = () => {
       id: video.metadata.uploader,
       next: [video.uid],
       data: { label: video.metadata.uploader, type: 'channel' },
-      stroke: 'red',
+      stroke: 'blue',
     };
   };
 
@@ -415,35 +409,59 @@ const GraphPage = () => {
         </FullScreen>
 
         {selectedVideo && (
-          <>
-            <VideoCard
-              video={selectedVideo.video}
-              actions={[]}
-              showPlayer={false}
-            />
+          <Grid container spacing={2}>
+            <Grid item sx={{ mb: 2 }} xs={12} md={6}>
+              <VideoCard
+                video={selectedVideo.video}
+                actions={[]}
+                showPlayer={false}
+              />
+            </Grid>
             {recommendedVideo ? (
               <>
-                <VideoCard
-                  video={recommendedVideo}
-                  actions={[]}
-                  showPlayer={false}
-                />
-                <Button
-                  color="secondary"
-                  variant="contained"
-                  endIcon={<Compare />}
-                  component={RouterLink}
-                  to={`${baseUrl}/comparison?uidA=${selectedVideo.video.uid}&uidB=${recommendedVideo.uid}`}
+                <Grid item sx={{ mb: 2 }} xs={12} md={6}>
+                  <VideoCard
+                    video={recommendedVideo}
+                    actions={[]}
+                    showPlayer={false}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
                 >
-                  {t('entityAnalysisPage.generic.compare')}
-                </Button>
+                  <Button
+                    size={'large'}
+                    color="secondary"
+                    variant="contained"
+                    endIcon={<Compare />}
+                    component={RouterLink}
+                    to={`${baseUrl}/comparison?uidA=${selectedVideo.video.uid}&uidB=${recommendedVideo.uid}`}
+                  >
+                    {t('entityAnalysisPage.generic.compare')}
+                  </Button>
+                </Grid>
               </>
             ) : (
-              <Typography variant={'h5'} align={'center'}>
-                Loading video to compare
-              </Typography>
+              <Grid
+                item
+                xs={12}
+                md={6}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <CircularProgress />
+              </Grid>
             )}
-          </>
+          </Grid>
         )}
 
         <Drawer
@@ -453,45 +471,37 @@ const GraphPage = () => {
             '& .MuiDrawer-paper': {
               width: drawerWidth,
             },
-            overflow: 'scroll',
           }}
           variant="persistent"
           anchor="right"
           open={drawerOpen}
         >
           <DrawerHeader />
-          <Container sx={{ mt: 1 }}>
-            <Typography variant={'h5'} align={'justify'}>
-              {drawerId}
-            </Typography>
-            <Grid container spacing={2} sx={{ mt: 2 }}>
-              {uploaderVideos.results?.map((video) => (
-                <Grid item xs={12} key={video?.metadata?.video_id}>
-                  <Card>
-                    <CardHeader title={video?.metadata?.name} />
-                    <CardContent>
-                      <Typography variant="body1" color="text.secondary">
-                        Comparisons: {video?.n_comparisons}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Uploaded on: {video?.metadata?.publication_date}
-                      </Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button
-                        size="small"
-                        onClick={() => navigateToEntityPage(video?.uid)}
-                        color={'secondary'}
-                        variant={'outlined'}
-                      >
-                        View
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))}
+          <Box
+            px={[2, 4]}
+            py={2}
+            color="text.secondary"
+            bgcolor="background.menu"
+            borderBottom="1px solid rgba(0, 0, 0, 0.12)"
+            height={contentHeaderHeight}
+          >
+            <Grid container spacing={1} justifyContent="space-between">
+              <Grid item flexGrow={1}>
+                <Typography variant={'h5'} align={'justify'}>
+                  {drawerId}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant={'contained'}
+                  onClick={() => dispatch(closeDrawer())}
+                >
+                  Close
+                </Button>
+              </Grid>
             </Grid>
-          </Container>
+            <EntityList entities={uploaderVideos.results} />
+          </Box>
         </Drawer>
       </Container>
     </>

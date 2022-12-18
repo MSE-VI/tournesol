@@ -41,7 +41,7 @@ export default function DrawGraph(
 }
 
 const getAlignedElements = (nodes: any[], edges: any[]) => {
-  const direction = 'TB';
+  const direction = 'LR';
 
   dagreGraph.setGraph({ rankdir: direction });
 
