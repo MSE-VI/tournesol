@@ -2,7 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Button, Chip,
+  Button,
+  Chip,
   CircularProgress,
   Container,
   Drawer,
@@ -59,7 +60,7 @@ const GraphPage = () => {
   });
 
   const [selectedVideo, setSelectedVideo] = React.useState<any>(null);
-  const [recommendedVideo, setRecommendedVideo] = React.useState<any>(null);
+  const [recommendedVideo, _setRecommendedVideo] = React.useState<any>(null);
 
   const drawerOpen = useAppSelector(selectFrameDrawerOpen);
   const drawerId = useAppSelector(selectFrameDrawerId);
@@ -105,6 +106,16 @@ const GraphPage = () => {
       id: video.uid,
       next: next,
       data: { label: video.metadata.name, type: 'video' },
+      stroke: 'red',
+    };
+  };
+
+  const constructGhostVideoNode = (video: any, next: any[]) => {
+    return {
+      type: 'node',
+      id: video.uid,
+      next: next,
+      data: { label: video.name, type: 'ghost' },
       stroke: 'red',
     };
   };
@@ -321,6 +332,19 @@ const GraphPage = () => {
     await delay(10);
   };
 
+  const setRecommendedVideo = (newVideo: any) => {
+    // delete current recommended video from list
+    if (recommendedVideo) {
+      setList((prev: any) => {
+        return {
+          ...prev,
+          nodes: prev.nodes.filter((n: any) => n.id !== recommendedVideo.id),
+        };
+      });
+    }
+    _setRecommendedVideo(newVideo);
+  };
+
   React.useEffect(() => {
     getComparisons();
   }, [pollName]);
@@ -332,6 +356,21 @@ const GraphPage = () => {
   React.useEffect(() => {
     retrieveVideos();
   }, [drawerId]);
+
+  React.useEffect(() => {
+    if (recommendedVideo) {
+      console.log(recommendedVideo);
+      setList((prev: any) => {
+        return {
+          ...prev,
+          nodes: [
+            ...prev.nodes,
+            constructGhostVideoNode(recommendedVideo, [selectedVideo]),
+          ],
+        };
+      });
+    }
+  }, [recommendedVideo]);
 
   React.useEffect(() => {
     if (selectedVideo === null) {
@@ -347,6 +386,7 @@ const GraphPage = () => {
         VideoService.videoRetrieve({
           videoId: entities.results[0].uid.split('yt:')[1],
         }).then((video) => {
+          console.log(video);
           setRecommendedVideo(video);
         });
       }

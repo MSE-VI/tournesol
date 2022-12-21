@@ -30,7 +30,9 @@ const CustomNode = ({ data, styles, selected }: any) => {
         backgroundColor:
           data.type === 'channel'
             ? 'rgba(171,205,239,0.9)'
-            : 'rgba(255,193,204,0.9)',
+            : data.type === 'video'
+            ? 'rgba(255,193,204,0.9)'
+            : 'rgba(217,217,217,0.9)',
         padding: '14px',
         borderRadius: '50px',
         height: '50px',
@@ -45,6 +47,8 @@ const CustomNode = ({ data, styles, selected }: any) => {
       <Tooltip title={data.label} placement={'top'}>
         {data.type === 'video' ? (
           <YouTubeIcon sx={{ fontSize: 22.5 }} color={'error'} />
+        ) : data.type === 'ghost' ? (
+          <YouTubeIcon sx={{ fontSize: 22.5, color: 'grey' }} />
         ) : (
           <UserIcon
             sx={{ fontSize: 22.5 }}
@@ -54,7 +58,7 @@ const CustomNode = ({ data, styles, selected }: any) => {
         )}
       </Tooltip>
 
-      {data.type === 'video' && (
+      {(data.type === 'video' || data.type === 'ghost') && (
         <Handle type={'target'} position={Position.Left} />
       )}
       <Handle
