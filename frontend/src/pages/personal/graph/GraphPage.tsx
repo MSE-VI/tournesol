@@ -2,11 +2,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Button, Chip,
+  Button,
   CircularProgress,
   Container,
   Drawer,
+  FormControlLabel, FormGroup, FormLabel,
   Grid,
+  Switch,
   Typography,
 } from '@mui/material';
 import { ContentHeader } from 'src/components';
@@ -33,6 +35,7 @@ import { useDispatch } from 'react-redux';
 import VideoCard from 'src/features/videos/VideoCard';
 import EntityList from '../../../features/entities/EntityList';
 import { contentHeaderHeight } from '../../../components/ContentHeader';
+import { ReactFlowProvider } from 'reactflow';
 
 const drawerWidth = 390;
 
@@ -52,6 +55,7 @@ const GraphPage = () => {
   const handle = useFullScreenHandle();
   const { baseUrl, name: pollName } = useCurrentPoll();
 
+  const [mixedLayout, setMixedLayout] = React.useState(true);
   const [comparisons, setComparisons] = React.useState<any[]>([]);
 
   const [list, setList] = React.useState<any>({
@@ -71,6 +75,10 @@ const GraphPage = () => {
 
   const delay = (ms: number) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  const onToggleLayout = () => {
+    setMixedLayout(!mixedLayout);
   };
 
   const retrieveVideos = async () => {
@@ -357,15 +365,27 @@ const GraphPage = () => {
     <>
       <ContentHeader title={t('myGraphPage.title')} />
       <Container sx={{ py: 2 }}>
-        <Button
-          sx={{ mb: 2 }}
-          variant={'outlined'}
-          color={'secondary'}
-          onClick={handle.enter}
-          startIcon={<Fullscreen />}
-        >
-          Go Fullscreen
-        </Button>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item>
+            <Button
+              variant={'outlined'}
+              color={'secondary'}
+              onClick={handle.enter}
+              startIcon={<Fullscreen />}
+            >
+              Go Fullscreen
+            </Button>
+          </Grid>
+          <Grid item>
+            <Grid component="label" container alignItems="center" spacing={1}>
+              <Grid item>Round Layout</Grid>
+              <Grid item>
+                <Switch checked={mixedLayout} onChange={onToggleLayout} />
+              </Grid>
+              <Grid item>Dagre Layout</Grid>
+            </Grid>
+          </Grid>
+        </Grid>
 
         <FullScreen handle={handle}>
           <Box
@@ -382,29 +402,35 @@ const GraphPage = () => {
                   }
             }
           >
-            <Board
-              nodesList={list}
-              ready={ready}
-              onClickHandler={(idx) => {
-                const node = list.nodes[idx];
-                VideoService.videoRetrieve({
-                  videoId: node.id.split('yt:')[1],
-                }).then((video) => {
-                  // Clear previous state
-                  setRecommendedVideo(null);
-                  if (selectedVideo) {
-                    list.nodes[selectedVideo.nodeIdx].selected = false;
-                  }
-
-                  // Set new state
-                  list.nodes[idx].selected = true;
-                  setSelectedVideo({
-                    video: video,
-                    nodeIdx: idx,
+            <ReactFlowProvider>
+              <Board
+                nodesList={list}
+                ready={ready}
+                mixedLayout={mixedLayout}
+                onClickHandler={(idx) => {
+                  const node = list.nodes.filter((n: any) => n.id === idx)[0];
+                  console.log(node);
+                  VideoService.videoRetrieve({
+                    videoId: node.id.split('yt:')[1],
+                  }).then((video) => {
+                    // Clear previous state
+                    setRecommendedVideo(null);
+                    if (selectedVideo) {
+                      const selectedVideoInList = list.nodes.filter(
+                        (n: any) => n.id === selectedVideo.nodeIdx
+                      )[0];
+                      selectedVideoInList.selected = false;
+                    }
+                    // Set new state
+                    node.selected = true;
+                    setSelectedVideo({
+                      video: video,
+                      nodeIdx: idx,
+                    });
                   });
-                });
-              }}
-            />
+                }}
+              />
+            </ReactFlowProvider>
           </Box>
         </FullScreen>
 
@@ -485,13 +511,13 @@ const GraphPage = () => {
             borderBottom="1px solid rgba(0, 0, 0, 0.12)"
             height={contentHeaderHeight}
           >
-            <Grid container spacing={1} justifyContent="space-between">
-              <Grid item flexGrow={1}>
-                <Typography variant={'h5'} align={'justify'}>
+            <Grid container spacing={1}>
+              <Grid item xs>
+                <Typography variant={'h6'} className={'cut-text'}>
                   {drawerId}
                 </Typography>
               </Grid>
-              <Grid item>
+              <Grid item alignItems={'end'} xs={3}>
                 <Button
                   variant={'contained'}
                   onClick={() => dispatch(closeDrawer())}
