@@ -1,28 +1,13 @@
-import React, { useState } from 'react';
-
-import { Handle, Position } from 'react-flow-renderer';
+import React from 'react';
+import { Handle, Position } from 'reactflow';
 import { Tooltip } from '@mui/material';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import UserIcon from '@mui/icons-material/Person';
 import { useDispatch } from 'react-redux';
 import { toggleDrawer } from '../../utils/reducers/drawerSlice';
-import { useHistory } from 'react-router-dom';
 
-const CustomNode = ({ data, styles, selected }: any) => {
-  const history = useHistory();
-  const navigateToEntityPage = (entity: string) =>
-    history.push(`/entities/${entity}`);
+const CustomNode = ({ data, selected }: any) => {
   const dispatch = useDispatch();
-
-  const [array, setArray] = useState<{ field: string; value: string | Blob }[]>(
-    []
-  );
-
-  //const [selected, setSelected] = useState(false);
-
-  React.useEffect(() => {
-    setArray(data);
-  }, [data]);
 
   return (
     <div
@@ -32,13 +17,13 @@ const CustomNode = ({ data, styles, selected }: any) => {
             ? 'rgba(171,205,239,0.9)'
             : 'rgba(255,193,204,0.9)',
         padding: '14px',
-        borderRadius: '50px',
+        borderRadius: '5px',
         height: '50px',
         boxShadow: selected ? '0 0 0 2px #000' : '0 0 0 2px #e0e0e0',
       }}
       onClick={() => {
         if (data.onClickHandler) {
-          data.onClickHandler();
+          data.onClickHandler(data.id);
         }
       }}
     >
