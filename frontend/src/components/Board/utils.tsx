@@ -118,7 +118,9 @@ export function createNodesAndEdges(nodeList: any, onClickHandler: any) {
           target: next,
           source: node.id,
           type: 'floating',
-          animated: false,
+          animated: !(
+            node.data.type === 'video' || node.data.type === 'channel'
+          ),
           style: { stroke: node.stroke },
         });
       });

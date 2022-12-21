@@ -1,22 +1,21 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import ReactFlow, {
   addEdge,
   Background,
   useNodesState,
   useEdgesState,
   ControlButton,
-  Controls, useReactFlow,
+  Controls,
+  useReactFlow,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-
-import FloatingEdge from './FloatingEdge';
-import { createNodesAndEdges } from './utils';
-
 import './styles.css';
 import CustomNode from './CustomNode';
 import { useHistory } from 'react-router';
 import { FullscreenExit } from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
+import FloatingEdge from './FloatingEdge';
+import { createNodesAndEdges } from './utils';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const dagre = require('dagre');
@@ -35,11 +34,7 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 const nodeWidth = 172;
 const nodeHeight = 36;
 
-const getLayoutedElements = (
-  nodes: any,
-  edges: any,
-  direction = 'TB'
-) => {
+const getLayoutedElements = (nodes: any, edges: any, direction = 'TB') => {
   const isHorizontal = direction === 'LR';
   dagreGraph.setGraph({ rankdir: direction });
 
@@ -71,7 +66,6 @@ const getLayoutedElements = (
   return { nodes, edges };
 };
 
-
 const Board: React.FC<{
   nodesList: any;
   ready: boolean;
@@ -84,10 +78,15 @@ const Board: React.FC<{
     history.push(`/comparison?uidA=${source}&uidB=${target}`);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [oldMixedLayout, setOldMixedLayout] = React.useState(mixedLayout);
+
+  const delay = (ms: number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
 
   const onConnect = useCallback(
     (params) => {
-      setEdges((eds) => addEdge({ ...params, type: 'floating' }, eds))
+      setEdges((eds) => addEdge({ ...params, type: 'floating' }, eds));
       // navigate to comparison page
       navigateToComparisonPage(params.source, params.target);
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,8 +123,11 @@ const Board: React.FC<{
   }, [nodesList, ready, mixedLayout]);
 
   React.useEffect(() => {
-    reactFlowInstance.fitView();
-  }, [nodes]); // eslint-disable-line react-hooks/exhaustive-deps
+    // Need to wait for the layout to be applied before we can zoom to fit
+    delay(1).then(() => {
+      reactFlowInstance.fitView();
+    });
+  }, [mixedLayout]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="floatingedges">

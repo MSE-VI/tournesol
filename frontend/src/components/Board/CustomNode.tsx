@@ -17,7 +17,7 @@ const CustomNode = ({ data, selected }: any) => {
             ? 'rgba(171,205,239,0.9)'
             : data.type === 'video'
             ? 'rgba(255,193,204,0.9)'
-            : 'rgba(217,217,217,0.9)',
+            : 'rgba(227,227,227,0.9)',
         padding: '14px',
         borderRadius: '5px',
         height: '50px',
@@ -33,7 +33,9 @@ const CustomNode = ({ data, selected }: any) => {
         {data.type === 'video' ? (
           <YouTubeIcon sx={{ fontSize: 22.5 }} color={'error'} />
         ) : data.type === 'ghost' ? (
-          <YouTubeIcon sx={{ fontSize: 22.5, color: 'grey' }} />
+          <YouTubeIcon sx={{ fontSize: 22.5, color: 'dimgrey' }} />
+        ) : data.type === 'channel-ghost' ? (
+          <UserIcon sx={{ fontSize: 22.5, color: 'dimgrey' }} />
         ) : (
           <UserIcon
             sx={{ fontSize: 22.5 }}
