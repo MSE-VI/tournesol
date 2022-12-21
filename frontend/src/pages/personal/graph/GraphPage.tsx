@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { ContentHeader } from 'src/components';
 import { FullScreen, useFullScreenHandle } from 'react-full-screen';
-import { Compare, Fullscreen } from '@mui/icons-material';
+import { Clear, Compare, Delete, Fullscreen } from '@mui/icons-material';
 import Board from 'src/components/Board/Board';
 import { getUserComparisons } from '../../../utils/api/comparisons';
 import { useCurrentPoll } from '../../../hooks';
@@ -63,7 +63,7 @@ const GraphPage = () => {
   });
 
   const [selectedVideo, setSelectedVideo] = React.useState<any>(null);
-  const [recommendedVideo, setRecommendedVideo] = React.useState<any>(null);
+  const [recommendedVideo, _setRecommendedVideo] = React.useState<any>(null);
 
   const drawerOpen = useAppSelector(selectFrameDrawerOpen);
   const drawerId = useAppSelector(selectFrameDrawerId);
@@ -81,7 +81,7 @@ const GraphPage = () => {
     setMixedLayout(!mixedLayout);
   };
 
-  const retrieveVideos = async () => {
+  const retrieveUploaderVideos = async () => {
     if (drawerId === '') {
       setUploaderVideos({ results: [], count: 0 });
     }
@@ -117,13 +117,39 @@ const GraphPage = () => {
     };
   };
 
+  const constructGhostVideoNode = (video: any, next: any[]) => {
+    return {
+      type: 'node',
+      id: video.uid,
+      next: next,
+      data: { label: video.name, type: 'ghost' },
+      stroke: 'grey',
+    };
+  };
+
   const constructChannelNode = (video: any) => {
     return {
       type: 'node',
-      id: video.metadata.uploader,
+      id: video.metadata?.uploader || video.uploader,
       next: [video.uid],
-      data: { label: video.metadata.uploader, type: 'channel' },
+      data: {
+        label: video.metadata?.uploader || video.uploader,
+        type: 'channel',
+      },
       stroke: 'blue',
+    };
+  };
+
+  const constructGhostChannelNode = (video: any) => {
+    return {
+      type: 'node',
+      id: video.metadata?.uploader || video.uploader,
+      next: [video.uid],
+      data: {
+        label: video.metadata?.uploader || video.uploader,
+        type: 'channel-ghost',
+      },
+      stroke: 'grey',
     };
   };
 
@@ -329,6 +355,19 @@ const GraphPage = () => {
     await delay(10);
   };
 
+  const setRecommendedVideo = (newVideo: any) => {
+    // delete current recommended video from list
+    if (recommendedVideo) {
+      setList((prev: any) => {
+        return {
+          ...prev,
+          nodes: prev.nodes.filter((n: any) => n.id !== recommendedVideo.id),
+        };
+      });
+    }
+    _setRecommendedVideo(newVideo);
+  };
+
   React.useEffect(() => {
     getComparisons();
   }, [pollName]);
@@ -338,8 +377,61 @@ const GraphPage = () => {
   }, [comparisons]);
 
   React.useEffect(() => {
-    retrieveVideos();
+    retrieveUploaderVideos();
   }, [drawerId]);
+
+  React.useEffect(() => {
+    if (recommendedVideo) {
+      const videosFromChannel = list.nodes.filter(
+        (node: any) => node.id === recommendedVideo.uploader
+      );
+      if (videosFromChannel.length === 0) {
+        setList((prev: any) => {
+          return {
+            ...prev,
+            nodes: [
+              ...prev.nodes,
+              constructGhostChannelNode(recommendedVideo),
+              constructGhostVideoNode(recommendedVideo, [
+                selectedVideo.nodeIdx,
+              ]),
+            ],
+          };
+        });
+      } else {
+        const array = list.nodes.map((n: any) => {
+          if (n.id === recommendedVideo.uploader) {
+            return {
+              ...n,
+              next: [...n.next, recommendedVideo.uid],
+            };
+          }
+          return n;
+        });
+        setList((prev: any) => {
+          return {
+            ...prev,
+            nodes: array.concat([
+              constructGhostVideoNode(recommendedVideo, [
+                selectedVideo.nodeIdx,
+              ]),
+            ]),
+          };
+        });
+      }
+    } else {
+      // remove all ghost videos and ghost channel
+      setList((prev: any) => {
+        return {
+          ...prev,
+          nodes: prev.nodes.filter(
+            (n: any) =>
+              n.data.type !== 'ghost' && n.data.type !== 'channel-ghost'
+          ),
+        };
+      });
+    }
+  }, [recommendedVideo]);
 
   React.useEffect(() => {
     if (selectedVideo === null) {
@@ -408,8 +500,12 @@ const GraphPage = () => {
                 ready={ready}
                 mixedLayout={mixedLayout}
                 onClickHandler={(idx) => {
+                  console.log('clicked', idx);
+                  console.log(
+                    'filter',
+                    list.nodes.filter((n: { id: any }) => n.id === idx)
+                  );
                   const node = list.nodes.filter((n: any) => n.id === idx)[0];
-                  console.log(node);
                   VideoService.videoRetrieve({
                     videoId: node.id.split('yt:')[1],
                   }).then((video) => {
@@ -470,6 +566,19 @@ const GraphPage = () => {
                     to={`${baseUrl}/comparison?uidA=${selectedVideo.video.uid}&uidB=${recommendedVideo.uid}`}
                   >
                     {t('entityAnalysisPage.generic.compare')}
+                  </Button>
+                  <Button
+                    size={'large'}
+                    color="error"
+                    variant="contained"
+                    endIcon={<Clear />}
+                    sx={{ ml: 2 }}
+                    onClick={() => {
+                      setSelectedVideo(null);
+                      setRecommendedVideo(null);
+                    }}
+                  >
+                    Clear
                   </Button>
                 </Grid>
               </>
