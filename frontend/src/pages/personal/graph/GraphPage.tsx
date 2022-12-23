@@ -230,7 +230,7 @@ const GraphPage = () => {
               next: [...n.next, item.entity_b.uid],
             };
           }
-          if (n.id === item.entity_b.uploader) {
+          if (n.id === item.entity_b.metadata.uploader) {
             return {
               ...n,
               next: [...n.next, item.entity_b.uid],
@@ -270,7 +270,7 @@ const GraphPage = () => {
               next: [...n.next, item.entity_a.uid],
             };
           }
-          if (n.id === item.entity_a.uploader) {
+          if (n.id === item.entity_a.metadata.uploader) {
             return {
               ...n,
               next: [...n.next, item.entity_a.uid],
@@ -500,11 +500,6 @@ const GraphPage = () => {
                 ready={ready}
                 mixedLayout={mixedLayout}
                 onClickHandler={(idx) => {
-                  console.log('clicked', idx);
-                  console.log(
-                    'filter',
-                    list.nodes.filter((n: { id: any }) => n.id === idx)
-                  );
                   const node = list.nodes.filter((n: any) => n.id === idx)[0];
                   VideoService.videoRetrieve({
                     videoId: node.id.split('yt:')[1],
